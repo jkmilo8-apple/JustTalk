@@ -85,6 +85,13 @@ function App() {
         const currentDebugMode = settings?.debug_mode ?? false;
         updateSetting("debug_mode", !currentDebugMode);
       }
+
+      // Escape to hide window
+      if (event.key === 'Escape' && !event.ctrlKey && !event.metaKey && !event.altKey) {
+        import('@tauri-apps/api/window').then(({ getCurrentWindow }) => {
+          getCurrentWindow().hide();
+        }).catch(() => {});
+      }
     };
 
     // Add event listener when component mounts
