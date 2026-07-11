@@ -92,8 +92,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     .map(([id, config]) => ({ id: id as SidebarSection, ...config }));
 
   return (
-    <div className="flex flex-col w-40 h-full border-e border-mid-gray/20 items-center px-2">
-        <JustTalkTextLogo width={160} className="m-4" />
+    <div className="flex flex-col w-52 h-full border-e border-mid-gray/20 items-center px-2">
+        <JustTalkTextLogo width={180} className="m-4" />
       <div className="flex flex-col w-full items-center gap-1 pt-2 border-t border-mid-gray/20">
         {availableSections.map((section) => {
           const Icon = section.icon;

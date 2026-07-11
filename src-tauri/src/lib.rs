@@ -803,10 +803,10 @@ pub fn run(cli_args: CliArgs) {
             let mut win_builder =
                 tauri::WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::App("/".into()))
                     .title("JustTalk")
-                    .inner_size(680.0, 570.0)
-                    .min_inner_size(680.0, 570.0)
+                    .inner_size(820.0, 660.0)
+                    .min_inner_size(680.0, 500.0)
                     .resizable(true)
-                    .maximizable(false)
+                    .maximizable(true)
                     .visible(false);
 
             if let Some(data_dir) = portable::data_dir() {
