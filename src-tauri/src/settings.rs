@@ -1099,10 +1099,7 @@ pub fn get_bindings(app: &AppHandle) -> HashMap<String, ShortcutBinding> {
 
 pub fn get_stored_binding(app: &AppHandle, id: &str) -> ShortcutBinding {
     let bindings = get_bindings(app);
-
-    let binding = bindings.get(id).unwrap().clone();
-
-    binding
+    bindings.get(id).cloned().unwrap_or_default()
 }
 
 pub fn get_history_limit(app: &AppHandle) -> usize {

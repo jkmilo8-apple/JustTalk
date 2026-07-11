@@ -18,6 +18,7 @@ interface SettingsStore {
   outputDevices: AudioDevice[];
   customSounds: { start: boolean; stop: boolean };
   postProcessModelOptions: Record<string, string[]>;
+  _modelStateUnlisten?: () => void;
 
   // Actions
   initialize: () => Promise<void>;
@@ -597,9 +598,14 @@ export const useSettingsStore = create<SettingsStore>()(
 
       // Re-fetch settings when the backend changes them (e.g. language
       // reset during model switch). The backend is the source of truth.
-      listen("model-state-changed", () => {
+      const unlisten = await listen("model-state-changed", () => {
         get().refreshSettings();
       });
+      // Store unlisten to prevent listener leaks on re-initialization
+      if (get()._modelStateUnlisten) {
+        get()._modelStateUnlisten();
+      }
+      set({ _modelStateUnlisten: unlisten });
     },
   })),
 );

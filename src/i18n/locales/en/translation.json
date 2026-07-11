@@ -519,6 +519,8 @@
         "bindingsReset": "Keyboard shortcuts were incompatible and reset to defaults"
       },
       "paths": {
+        "title": "Debug Paths",
+        "description": "Display internal file paths and directories for debugging purposes",
         "appData": "App Data:",
         "models": "Models:",
         "settings": "Settings:"
