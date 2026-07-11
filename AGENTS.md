@@ -2,9 +2,13 @@
 
 This file provides guidance to AI coding assistants working with code in this repository.
 
-## Development Commands
+## Project Identity
 
-**Prerequisites:**
+This repository is **JustTalk** — a cross-platform desktop speech-to-text application built with Tauri 2.x (Rust backend + React/TypeScript frontend). It is a fork of [Handy](https://github.com/cjpais/handy) by @cjpais.
+
+**Target audience:** Vibe coders in Latin America who program with AI, dictate prompts instead of typing, and work in VS Code, Cursor, Claude Code, OpenCode, and terminals.
+
+**Brand:** "Dicta tus prompts, programa con IA." Copy is in Spanish (neutral LATAM). The brand uses neon green (#00E5A0) + purple (#7C3AED) on dark backgrounds. See [BRANDING.md](BRANDING.md) for the full identity guide.
 
 - [Rust](https://rustup.rs/) (latest stable)
 - [Bun](https://bun.sh/) package manager
@@ -51,7 +55,7 @@ For detailed platform-specific build setup, see [BUILD.md](BUILD.md).
 
 ## Architecture Overview
 
-Handy is a cross-platform desktop speech-to-text application built with Tauri 2.x (Rust backend + React/TypeScript frontend).
+JustTalk is a cross-platform desktop speech-to-text application built with Tauri 2.x (Rust backend + React/TypeScript frontend).
 
 ### Backend Structure (src-tauri/src/)
 
@@ -171,7 +175,7 @@ For translation contribution guidelines, see [CONTRIBUTING_TRANSLATIONS.md](CONT
 
 ## CLI Parameters
 
-Handy supports command-line parameters on all platforms for integration with scripts, window managers, and autostart configurations.
+JustTalk supports command-line parameters on all platforms for integration with scripts, window managers, and autostart configurations.
 
 **Implementation:** `cli.rs` (definitions), `main.rs` (parsing), `lib.rs` (applying), `signal_handle.rs` (shared logic)
 
@@ -198,7 +202,7 @@ Access debug features: `Cmd+Shift+D` (macOS) or `Ctrl+Shift+D` (Windows/Linux)
 
 - **macOS**: Metal acceleration, accessibility permissions required for keyboard shortcuts
 - **Windows**: Vulkan acceleration, code signing
-- **Linux**: OpenBLAS + Vulkan, limited Wayland support, overlay uses GTK layer shell (disable with `HANDY_NO_GTK_LAYER_SHELL=1`)
+- **Linux**: OpenBLAS + Vulkan, limited Wayland support, overlay uses GTK layer shell (disable with `JUSTTALK_NO_GTK_LAYER_SHELL=1`)
 
 ## Troubleshooting
 
@@ -210,7 +214,7 @@ See the [Troubleshooting](README.md#troubleshooting) section in README.md.
 
 - **Opening a PR:** Read [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md). Every section listed there is mandatory. If a section requires a human-written paragraph (e.g. "Human Written Description"), leave a clear TODO placeholder and ask the human contributor to fill it in — do not invent their voice.
 - **Opening an issue:** Read [`.github/ISSUE_TEMPLATE/`](.github/ISSUE_TEMPLATE/). Blank issues are disabled; pick the right template (`bug_report.md` for bugs). Feature requests do not belong in issues — they go to [Discussions](https://github.com/cjpais/Handy/discussions) (see `.github/ISSUE_TEMPLATE/config.yml`).
-- **Proposing a feature:** Handy is under a feature freeze. New features require community support gathered in [Discussions](https://github.com/cjpais/Handy/discussions) before any PR is opened — see the PR template's "Community Feedback" section.
+- **Proposing a feature:** JustTalk welcomes community feedback. Gather support in [Discussions](https://github.com/justtalk-app/JustTalk/discussions) before any PR is opened.
 - **Translations:** Follow [CONTRIBUTING_TRANSLATIONS.md](CONTRIBUTING_TRANSLATIONS.md).
 - **Full contributor workflow:** [CONTRIBUTING.md](CONTRIBUTING.md).
 

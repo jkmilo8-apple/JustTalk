@@ -1,0 +1,32 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "username": "jkmilo8-apple",
+  "instructions": ["AGENTS.md", "BRANDING.md"],
+  "mcp": {
+    "github": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-github"],
+      "enabled": true,
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "{env:GITHUB_TOKEN}"
+      }
+    },
+    "filesystem": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-filesystem"],
+      "enabled": true,
+      "args": ["C:\\source\\JustTalk"]
+    }
+  },
+  "references": {
+    "justtalk": {
+      "repository": "jkmilo8-apple/JustTalk",
+      "description": "JustTalk app source code - speech-to-text for LATAM vibe coders"
+    }
+  },
+  "permission": {
+    "edit": "allow",
+    "bash": { "git *": "allow", "bun *": "allow", "cargo *": "allow", "*": "ask" },
+    "webfetch": "allow"
+  }
+}

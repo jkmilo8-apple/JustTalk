@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JustTalk - Dicta tus prompts, programa con IA</title>
+  <meta name="description" content="La app de voz a texto hecha para devs latinos. Dicta código, prompts y comandos en español. 100% offline, privada, y rapidísima. Hecha para VS Code, terminales y vibe coders." />
+  <meta property="og:title" content="JustTalk - Dicta tus prompts, programa con IA" />
+  <meta property="og:description" content="Speech-to-text hecho por y para devs de LATAM. Zero latencia. 100% offline. Privacidad total." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://justtalk.app" />
+  <meta name="theme-color" content="#0A0A0F" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            neon: '#00E5A0',
+            'neon-dim': '#00B380',
+            purple: '#7C3AED',
+            'purple-glow': '#A78BFA',
+            dark: '#0A0A0F',
+            'dark-card': '#111118',
+            'dark-border': '#1E1E2E',
+            muted: '#8888A0',
+            'muted-light': '#A0A0B8',
+          },
+          fontFamily: {
+            mono: ['JetBrains Mono', 'Fira Code', 'Cascadia Code', 'monospace'],
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    * { scroll-behavior: smooth; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0A0A0F; }
+    ::-webkit-scrollbar-thumb { background: #1E1E2E; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #2E2E3E; }
+
+    /* Terminal scanline effect */
+    .scanlines::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* Glow animations */
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(0,229,160,0.15), 0 0 60px rgba(0,229,160,0.05); }
+      50% { box-shadow: 0 0 30px rgba(0,229,160,0.3), 0 0 80px rgba(0,229,160,0.1); }
+    }
+    @keyframes pulse-glow-purple {
+      0%, 100% { box-shadow: 0 0 20px rgba(124,58,237,0.15), 0 0 60px rgba(124,58,237,0.05); }
+      50% { box-shadow: 0 0 30px rgba(124,58,237,0.3), 0 0 80px rgba(124,58,237,0.1); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-glow { animation: pulse-glow 3s ease-in-out infinite; }
+    .animate-glow-purple { animation: pulse-glow-purple 3s ease-in-out infinite; }
+    .animate-float { animation: float 4s ease-in-out infinite; }
+    .cursor-blink::after { content: '▊'; animation: blink 1s step-end infinite; color: #00E5A0; }
+    .fade-in { animation: fadeInUp 0.8s ease-out forwards; }
+    .delay-100 { animation-delay: 0.1s; }
+    .delay-200 { animation-delay: 0.2s; }
+    .delay-300 { animation-delay: 0.3s; }
+    .delay-400 { animation-delay: 0.4s; }
+  </style>
+</head>
+<body class="bg-dark text-white font-sans antialiased overflow-x-hidden">
+
+  <!-- ===== NAV ===== -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-dark/80 backdrop-blur-xl border-b border-dark-border">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2 group">
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-neon to-purple flex items-center justify-center text-dark font-bold text-sm font-mono group-hover:scale-105 transition-transform">JT</div>
+        <span class="font-extrabold text-xl tracking-tight">Just<span class="text-neon">Talk</span></span>
+        <span class="text-[10px] bg-purple/20 text-purple-glow px-2 py-0.5 rounded-full font-mono uppercase tracking-wider hidden sm:inline-block">BETA</span>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="#features" class="text-muted hover:text-white transition-colors text-sm hidden md:block">Features</a>
+        <a href="#download" class="text-muted hover:text-white transition-colors text-sm hidden md:block">Descargar</a>
+        <a href="https://github.com/justtalk-app/JustTalk" target="_blank" class="text-muted hover:text-white transition-colors text-sm hidden md:block">GitHub</a>
+        <a href="#download" class="px-4 py-2 bg-gradient-to-r from-neon to-neon-dim text-dark font-semibold rounded-lg text-sm hover:scale-105 transition-transform shadow-lg shadow-neon/20">
+          Descargar gratis
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <section class="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden scanlines">
+    <!-- Grid background -->
+    <div class="absolute inset-0 bg-[linear-gradient(rgba(30,30,46,0.5)_1px,transparent_1px),linear-gradient(90deg,rgba(30,30,46,0.5)_1px,transparent_1px)] bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_40%,#000_40%,transparent_70%)]"></div>
+
+    <!-- Floating orbs -->
+    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-neon/5 rounded-full blur-[128px] animate-float"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-72 h-72 bg-purple/5 rounded-full blur-[100px] animate-float" style="animation-delay: 2s;"></div>
+
+    <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+      <!-- Badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-neon/20 bg-neon/5 mb-8 opacity-0 fade-in">
+        <span class="w-2 h-2 rounded-full bg-neon animate-pulse"></span>
+        <span class="text-neon font-mono text-xs uppercase tracking-widest">Hecho en LATAM para LATAM</span>
+      </div>
+
+      <!-- Main headline -->
+      <h1 class="text-5xl md:text-7xl lg:text-8xl font-extrabold leading-none tracking-tight mb-6 opacity-0 fade-in delay-100">
+        <span class="text-white">Dicta tus</span><br/>
+        <span class="bg-gradient-to-r from-neon via-neon to-purple-glow bg-clip-text text-transparent">prompts</span><span class="text-white">,</span><br/>
+        <span class="text-white">programa con</span>
+        <span class="bg-gradient-to-r from-purple to-purple-glow bg-clip-text text-transparent">IA</span>
+      </h1>
+
+      <p class="text-lg md:text-xl text-muted-light max-w-2xl mx-auto mb-10 leading-relaxed opacity-0 fade-in delay-200">
+        La app de voz a texto hecha <strong class="text-white">por devs para devs</strong>. Dicta tus prompts en español, escribe código más rápido que nunca, y mantén el flow. <span class="text-neon font-mono">100% offline</span>. Zero latencia. Privacidad total.
+      </p>
+
+      <!-- CTA Buttons -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 opacity-0 fade-in delay-300">
+        <a href="#download" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-neon to-neon-dim text-dark font-bold text-lg rounded-xl hover:scale-105 transition-all shadow-xl shadow-neon/20 flex items-center justify-center gap-2 group">
+          <svg class="w-5 h-5 group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          Descargar JustTalk
+        </a>
+        <a href="https://github.com/justtalk-app/JustTalk" target="_blank" class="w-full sm:w-auto px-8 py-4 border border-dark-border hover:border-muted text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          Ver en GitHub
+        </a>
+      </div>
+
+      <!-- Terminal preview -->
+      <div class="mt-16 max-w-2xl mx-auto opacity-0 fade-in delay-400">
+        <div class="bg-dark-card border border-dark-border rounded-xl overflow-hidden shadow-2xl animate-glow-purple">
+          <div class="flex items-center gap-2 px-4 py-3 bg-[#0D0D16] border-b border-dark-border">
+            <div class="w-3 h-3 rounded-full bg-[#FF5F56]"></div>
+            <div class="w-3 h-3 rounded-full bg-[#FFBD2E]"></div>
+            <div class="w-3 h-3 rounded-full bg-[#27C93F]"></div>
+            <span class="ml-3 text-xs text-muted font-mono">terminal — justtalk</span>
+          </div>
+          <div class="p-5 font-mono text-sm leading-relaxed text-left">
+            <div class="flex">
+              <span class="text-neon mr-2 shrink-0">➜</span>
+              <span class="text-purple-glow">~/proyectos/mi-app</span>
+              <span class="text-muted ml-1">git:(main)</span>
+            </div>
+            <div class="flex mt-3">
+              <span class="text-neon mr-2 shrink-0">$</span>
+              <div class="text-white/80 overflow-hidden whitespace-nowrap border-r-2 border-neon" style="width: 0; animation: typing 3s steps(60) 0.5s forwards;">
+                quiero un hook de React que maneje el estado del carrito con useContext y useReducer
+              </div>
+            </div>
+            <div class="text-muted mt-2 opacity-0" style="animation: fadeInUp 0.5s 3.5s forwards;">
+              <span class="text-neon">✦</span> Dictado en 1.2s — 247 caracteres
+            </div>
+            <div class="flex mt-2">
+              <span class="text-neon mr-2 shrink-0">$</span>
+              <span class="text-white/50">
+                <span class="text-neon">▊</span>
+              </span>
+            </div>
+          </div>
+        </div>
+        <p class="text-xs text-muted mt-3 font-mono">Asi de simple. Hablas, JustTalk escribe. Como un pair programmer 24/7.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURES ===== -->
+  <section id="features" class="relative py-32 px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-20">
+        <h2 class="text-3xl md:text-5xl font-extrabold mb-4">
+          Por que <span class="text-neon">los devs</span> de LATAM<br/>estan usando JustTalk
+        </h2>
+        <p class="text-muted-light text-lg max-w-xl mx-auto">No es otra app de dictado. Es tu copiloto de voz, pensado para el flow del vibe coder.</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <!-- Feature 1 -->
+        <div class="group bg-dark-card border border-dark-border rounded-2xl p-8 hover:border-neon/30 transition-all duration-300 hover:-translate-y-1">
+          <div class="w-12 h-12 rounded-xl bg-neon/10 flex items-center justify-center mb-5 group-hover:bg-neon/20 transition-colors">
+            <svg class="w-6 h-6 text-neon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <h3 class="text-xl font-bold mb-3">Zero latencia</h3>
+          <p class="text-muted leading-relaxed">
+            Procesamiento local con Whisper + Parakeet. Sin internet, sin nubes, sin esperas. Tu voz se convierte en texto <span class="text-white">en milisegundos</span>.
+          </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="group bg-dark-card border border-dark-border rounded-2xl p-8 hover:border-purple/30 transition-all duration-300 hover:-translate-y-1">
+          <div class="w-12 h-12 rounded-xl bg-purple/10 flex items-center justify-center mb-5 group-hover:bg-purple/20 transition-colors">
+            <svg class="w-6 h-6 text-purple-glow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          </div>
+          <h3 class="text-xl font-bold mb-3">100% Privado</h3>
+          <p class="text-muted leading-relaxed">
+            Tu voz <span class="text-white">nunca sale de tu maquina</span>. Todo el procesamiento corre local. Sin trackers, sin telemetria forzada, sin servidores en gringolandia.
+          </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="group bg-dark-card border border-dark-border rounded-2xl p-8 hover:border-neon/30 transition-all duration-300 hover:-translate-y-1">
+          <div class="w-12 h-12 rounded-xl bg-neon/10 flex items-center justify-center mb-5 group-hover:bg-neon/20 transition-colors">
+            <svg class="w-6 h-6 text-neon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+          </div>
+          <h3 class="text-xl font-bold mb-3">Multilenguaje real</h3>
+          <p class="text-muted leading-relaxed">
+            Te entiende en <span class="text-white">espanol, ingles, portugues y mas de 90 idiomas</span>. Code-switching sin drama. "Dame un useEffect que haga fetch a la API" lo captura perfecto.
+          </p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="group bg-dark-card border border-dark-border rounded-2xl p-8 hover:border-purple/30 transition-all duration-300 hover:-translate-y-1">
+          <div class="w-12 h-12 rounded-xl bg-purple/10 flex items-center justify-center mb-5 group-hover:bg-purple/20 transition-colors">
+            <svg class="w-6 h-6 text-purple-glow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+          </div>
+          <h3 class="text-xl font-bold mb-3">VS Code, Cursor, Terminal</h3>
+          <p class="text-muted leading-relaxed">
+            Funciona donde tu trabajas. <span class="text-white">Shortcut global</span> para activar el microfono desde cualquier app. Compatible con VS Code, Cursor, Windsurf, Claude Code, OpenCode y tu terminal.
+          </p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="group bg-dark-card border border-dark-border rounded-2xl p-8 hover:border-neon/30 transition-all duration-300 hover:-translate-y-1">
+          <div class="w-12 h-12 rounded-xl bg-neon/10 flex items-center justify-center mb-5 group-hover:bg-neon/20 transition-colors">
+            <svg class="w-6 h-6 text-neon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          </div>
+          <h3 class="text-xl font-bold mb-3">Post-procesamiento con IA</h3>
+          <p class="text-muted leading-relaxed">
+            Conecta tu API key de OpenAI, Claude o Gemini. JustTalk <span class="text-white">formatea, mejora y estructura</span> automaticamente lo que dictas. Tus prompts siempre salen limpios.
+          </p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="group bg-dark-card border border-dark-border rounded-2xl p-8 hover:border-purple/30 transition-all duration-300 hover:-translate-y-1">
+          <div class="w-12 h-12 rounded-xl bg-purple/10 flex items-center justify-center mb-5 group-hover:bg-purple/20 transition-colors">
+            <svg class="w-6 h-6 text-purple-glow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          </div>
+          <h3 class="text-xl font-bold mb-3">Open Source</h3>
+          <p class="text-muted leading-relaxed">
+            Codigo abierto bajo licencia MIT. <span class="text-white">Hecho para ser forkeado</span>, extendido, y mejorado por la comunidad. Si algo no te gusta, le metes mano.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HOW IT WORKS ===== -->
+  <section class="relative py-24 px-6 bg-dark-card/50 border-y border-dark-border">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="text-3xl md:text-4xl font-extrabold mb-16">Asi de <span class="text-neon">simple</span> es</h2>
+      <div class="grid md:grid-cols-4 gap-8">
+        <div class="flex flex-col items-center">
+          <div class="w-16 h-16 rounded-2xl bg-neon/10 flex items-center justify-center mb-4 text-2xl">🎙️</div>
+          <h4 class="font-bold mb-2">Presiona</h4>
+          <p class="text-sm text-muted">Ctrl+Space y habla</p>
+        </div>
+        <div class="flex flex-col items-center">
+          <div class="w-16 h-16 rounded-2xl bg-purple/10 flex items-center justify-center mb-4 text-2xl">🗣️</div>
+          <h4 class="font-bold mb-2">Dicta</h4>
+          <p class="text-sm text-muted">Tu prompt o comando</p>
+        </div>
+        <div class="flex flex-col items-center">
+          <div class="w-16 h-16 rounded-2xl bg-neon/10 flex items-center justify-center mb-4 text-2xl">⚡</div>
+          <h4 class="font-bold mb-2">Procesa</h4>
+          <p class="text-sm text-muted">IA local en milisegundos</p>
+        </div>
+        <div class="flex flex-col items-center">
+          <div class="w-16 h-16 rounded-2xl bg-purple/10 flex items-center justify-center mb-4 text-2xl">✨</div>
+          <h4 class="font-bold mb-2">Escribe</h4>
+          <p class="text-sm text-muted">Texto donde estas</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TESTIMONIAL / SOCIAL PROOF ===== -->
+  <section class="relative py-24 px-6">
+    <div class="max-w-4xl mx-auto text-center">
+      <p class="text-muted font-mono text-xs uppercase tracking-widest mb-8">La comunidad latina ya lo esta usando</p>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="bg-dark-card border border-dark-border rounded-2xl p-6 text-left">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-neon to-purple flex items-center justify-center text-dark font-bold">D</div>
+            <div>
+              <p class="font-semibold text-sm">Diego R.</p>
+              <p class="text-muted text-xs">Senior Dev · Argentina</p>
+            </div>
+          </div>
+          <p class="text-muted-light text-sm leading-relaxed">"Dicto prompts en espanol en Cursor y JustTalk me entiende mejor que cualquier otra app. Ya no toco el teclado para hablar con la IA."</p>
+        </div>
+        <div class="bg-dark-card border border-dark-border rounded-2xl p-6 text-left">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple to-purple-glow flex items-center justify-center text-white font-bold">C</div>
+            <div>
+              <p class="font-semibold text-sm">Camila T.</p>
+              <p class="text-muted text-xs">Fullstack · Mexico</p>
+            </div>
+          </div>
+          <p class="text-muted-light text-sm leading-relaxed">"Lo uso para documentar codigo dictando comentarios en espanol. Me ahorra horas. Y es open source, asi que confio."</p>
+        </div>
+        <div class="bg-dark-card border border-dark-border rounded-2xl p-6 text-left">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-neon-dim to-neon flex items-center justify-center text-dark font-bold">A</div>
+            <div>
+              <p class="font-semibold text-sm">Andres L.</p>
+              <p class="text-muted text-xs">DevOps · Colombia</p>
+            </div>
+          </div>
+          <p class="text-muted-light text-sm leading-relaxed">"Dicto comandos de terminal mientras debuggeo. Es brutal. El post-procesamiento con Claude le da un toque premium."</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DOWNLOAD ===== -->
+  <section id="download" class="relative py-24 px-6 bg-dark-card/50 border-y border-dark-border">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="text-3xl md:text-5xl font-extrabold mb-4">Bajate <span class="text-neon">JustTalk</span> hoy</h2>
+      <p class="text-muted-light text-lg mb-12">Gratis. Open source. Sin registros. Sin cloud. Solo vos y tu codigo.</p>
+
+      <div class="grid sm:grid-cols-3 gap-4 mb-8">
+        <a href="#" class="bg-dark-card border border-dark-border rounded-xl p-6 hover:border-neon/40 transition-all group text-center">
+          <div class="text-3xl mb-3">🍎</div>
+          <h4 class="font-bold mb-1">macOS</h4>
+          <p class="text-xs text-muted">Apple Silicon + Intel</p>
+          <span class="inline-block mt-3 text-neon text-xs font-mono group-hover:underline">Próximamente</span>
+        </a>
+        <a href="#" class="bg-dark-card border border-dark-border rounded-xl p-6 hover:border-neon/40 transition-all group text-center">
+          <div class="text-3xl mb-3">🪟</div>
+          <h4 class="font-bold mb-1">Windows</h4>
+          <p class="text-xs text-muted">x64 · Windows 10/11</p>
+          <span class="inline-block mt-3 text-neon text-xs font-mono group-hover:underline">Próximamente</span>
+        </a>
+        <a href="#" class="bg-dark-card border border-dark-border rounded-xl p-6 hover:border-neon/40 transition-all group text-center">
+          <div class="text-3xl mb-3">🐧</div>
+          <h4 class="font-bold mb-1">Linux</h4>
+          <p class="text-xs text-muted">AppImage · deb · rpm</p>
+          <span class="inline-block mt-3 text-neon text-xs font-mono group-hover:underline">Próximamente</span>
+        </a>
+      </div>
+
+      <div class="bg-dark-card border border-neon/20 rounded-2xl p-8 text-left animate-glow">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="w-2 h-2 rounded-full bg-neon animate-pulse"></span>
+          <span class="font-mono text-xs text-neon uppercase tracking-widest">Compilalo vos mismo</span>
+        </div>
+        <div class="bg-[#0D0D16] rounded-xl p-5 font-mono text-sm leading-relaxed overflow-x-auto">
+          <div class="text-muted select-none"># 1. Clona el repo</div>
+          <div><span class="text-purple-glow">git clone</span> <span class="text-neon">https://github.com/justtalk-app/JustTalk.git</span></div>
+          <div class="text-muted select-none mt-3"># 2. Instala dependencias</div>
+          <div><span class="text-purple-glow">cd</span> JustTalk <span class="text-muted">&&</span> bun install</div>
+          <div class="text-muted select-none mt-3"># 3. Corre en dev</div>
+          <div>bun run tauri dev</div>
+          <div class="text-muted select-none mt-3"># 4. O build para produccion</div>
+          <div>bun run tauri build</div>
+        </div>
+      </div>
+
+      <p class="mt-8 text-muted text-sm">
+        Requisitos: <a href="https://rustup.rs" class="text-neon hover:underline" target="_blank">Rust</a> + 
+        <a href="https://bun.sh" class="text-neon hover:underline" target="_blank">Bun</a> · 
+        <a href="https://github.com/justtalk-app/JustTalk/blob/main/BUILD.md" class="text-purple-glow hover:underline" target="_blank">Guia de build completa</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="py-12 px-6 border-t border-dark-border">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-neon to-purple flex items-center justify-center text-dark font-bold text-xs font-mono">JT</div>
+        <span class="text-muted text-sm">JustTalk · 2025 · Hecho con <span class="text-neon">♥</span> en LATAM</span>
+      </div>
+      <div class="flex items-center gap-6 text-sm text-muted">
+        <a href="https://github.com/justtalk-app/JustTalk" target="_blank" class="hover:text-white transition-colors">GitHub</a>
+        <a href="https://github.com/justtalk-app/JustTalk/blob/main/LICENSE" target="_blank" class="hover:text-white transition-colors">MIT License</a>
+        <a href="https://github.com/justtalk-app/JustTalk/discussions" target="_blank" class="hover:text-white transition-colors">Comunidad</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
