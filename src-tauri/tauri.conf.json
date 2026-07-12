@@ -77,9 +77,9 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEJBQjcyMDk1MjA2NjAxRjkKUldUNUFXWWdsU0MzdXRRZi8zYzhqV2FaNUVDbDd2Rk5VM1IvWWowVXdmRFNKQ1BrMXF5RFFsLy8K",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDEwMzg3MTBFMjRCNzY0RjUKUldUMVpMY2tEbkU0RU9Va1M2QzVZT0hjWUdTRFAwL1FROWR2MVh3d1ZiVjNwY1RSeFJna1loL3gK",
       "endpoints": [
-        "https://github.com/justtalk-app/JustTalk/releases/latest/download/latest.json"
+        "https://github.com/jkmilo8-apple/JustTalk/releases/latest/download/latest.json"
       ]
     }
   }
